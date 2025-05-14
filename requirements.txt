@@ -40,3 +40,4 @@ tzdata==2025.2
 urllib3==2.4.0
 python-dotenv
 langchain_community
+openai
