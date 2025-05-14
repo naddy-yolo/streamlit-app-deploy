@@ -1,8 +1,5 @@
-from dotenv import load_dotenv
-load_dotenv()
-
-import os
 import streamlit as st
+import openai
 from langchain_community.chat_models import ChatOpenAI
 from langchain.schema import SystemMessage, HumanMessage
 
@@ -27,27 +24,25 @@ if st.button("送信"):
     elif expert_type == "メンタルコーチ":
         system_prompt = "あなたは有能なメンタルコーチです。相談者の心の支えになるよう、丁寧で思いやりのある返答をしてください。"
 
-    # OpenAI APIキーを環境変数から取得
-    openai_api_key = os.getenv("OPENAI_API_KEY")
-    if not openai_api_key:
-        st.error("OpenAI APIキーが設定されていません。")
-    else:
-        # Chatモデルの準備
-        chat = ChatOpenAI(
-            model="gpt-3.5-turbo",
-            temperature=0.7,
-            openai_api_key=openai_api_key
-        )
+    # OpenAI APIキーを Streamlit Cloud の secrets から取得
+    openai_api_key = st.secrets["OPENAI_API_KEY"]
 
-        # メッセージ構築
-        messages = [
-            SystemMessage(content=system_prompt),
-            HumanMessage(content=user_input)
-        ]
+    # Chatモデルの準備
+    chat = ChatOpenAI(
+        model="gpt-3.5-turbo",
+        temperature=0.7,
+        openai_api_key=openai_api_key
+    )
 
-        # 回答生成
-        response = chat.invoke(messages)
+    # メッセージ構築
+    messages = [
+        SystemMessage(content=system_prompt),
+        HumanMessage(content=user_input)
+    ]
 
-        # 回答表示
-        st.write("AIからの回答：")
-        st.write(response.content)
+    # 回答生成
+    response = chat.invoke(messages)
+
+    # 回答表示
+    st.write("AIからの回答：")
+    st.write(response.content)
